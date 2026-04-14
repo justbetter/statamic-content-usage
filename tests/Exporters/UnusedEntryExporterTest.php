@@ -6,6 +6,7 @@ use JustBetter\StatamicContentUsage\Exporters\UnusedEntryExporter;
 use JustBetter\StatamicContentUsage\Tests\TestCase;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 
 class UnusedEntryExporterTest extends TestCase
@@ -13,7 +14,7 @@ class UnusedEntryExporterTest extends TestCase
     #[Test]
     public function it_can_export_to_csv(): void
     {
-        $collection = $this->mock(\Statamic\Entries\Collection::class, function (MockInterface $mock): void {
+        $collection = $this->mock(Collection::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('blog');
         });
 

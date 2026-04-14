@@ -2,18 +2,20 @@
 
 namespace JustBetter\StatamicContentUsage\Tests\Exporters;
 
+use Illuminate\Support\Collection;
 use JustBetter\StatamicContentUsage\Exporters\UnusedAssetExporter;
 use JustBetter\StatamicContentUsage\Tests\TestCase;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
 
 class UnusedAssetExporterTest extends TestCase
 {
     #[Test]
     public function it_can_export_to_csv(): void
     {
-        $container = $this->mock(\Statamic\Assets\AssetContainer::class, function (MockInterface $mock): void {
+        $container = $this->mock(AssetContainer::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('main');
         });
 
@@ -25,7 +27,7 @@ class UnusedAssetExporterTest extends TestCase
         });
 
         $exporter = new UnusedAssetExporter;
-        /** @var \Illuminate\Support\Collection<int, Asset> $assetsCollection */
+        /** @var Collection<int, Asset> $assetsCollection */
         $assetsCollection = collect([$asset]);
         $result = $exporter->exportToCsv($assetsCollection);
 

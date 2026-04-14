@@ -14,6 +14,7 @@ use JustBetter\StatamicContentUsage\Tests\TestCase;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
 
 class AssetUsageControllerTest extends TestCase
 {
@@ -96,7 +97,7 @@ class AssetUsageControllerTest extends TestCase
     #[Test]
     public function it_can_export_unused_assets_to_csv(): void
     {
-        $container = $this->mock(\Statamic\Assets\AssetContainer::class, function (MockInterface $mock): void {
+        $container = $this->mock(AssetContainer::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('main');
         });
 
