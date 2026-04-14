@@ -3,6 +3,7 @@
 namespace JustBetter\StatamicContentUsage\Services;
 
 use Illuminate\Support\Collection;
+use JustBetter\StatamicContentUsage\Data\ContentSourceData;
 use JustBetter\StatamicContentUsage\Data\EntryPageUsageData;
 use JustBetter\StatamicContentUsage\Data\EntryUsageData;
 use Statamic\Entries\Entry;
@@ -33,11 +34,9 @@ class EntryUsageService
         /** @var Collection<string, EntryUsageData> $usage */
         $usage = collect();
 
-        /** @var Collection<int, Entry> $allEntries */
-        $allEntries = EntryFacade::all();
-
-        foreach ($allEntries as $entry) {
-            $this->processEntry($entry, $sourceEntries, $usage);
+        $sources = (new ContentSourceScanner)->scan();
+        foreach ($sources as $source) {
+            $this->processSource($source, $sourceEntries, $usage);
         }
 
         return $usage->map(function (EntryUsageData $item) {
@@ -51,17 +50,11 @@ class EntryUsageService
      * @param  Collection<int, Entry>  $sourceEntries
      * @param  Collection<string, EntryUsageData>  $usage
      */
-    protected function processEntry(Entry $entry, Collection $sourceEntries, Collection $usage): void
+    protected function processSource(ContentSourceData $source, Collection $sourceEntries, Collection $usage): void
     {
-        $entryId = $entry->id();
-        $entryTitle = $entry->get('title', '');
-        $entryUrl = $entry->url() ?? '';
-        $entryCollection = $entry->collection()->handle();
-
-        $referencedEntryIds = $this->extractEntryReferencesFromEntry($entry, $sourceEntries);
-
+        $referencedEntryIds = $this->extractEntryReferencesFromDataArray($source->data, $sourceEntries);
         foreach ($referencedEntryIds as $referencedEntryId) {
-            $this->processReferencedEntry($referencedEntryId, $entryId, $entryTitle, $entryUrl, $entryCollection, $usage);
+            $this->processReferencedEntry($referencedEntryId, $source->id, $source->title, $source->url, $source->collection, $usage);
         }
     }
 
@@ -135,15 +128,14 @@ class EntryUsageService
     }
 
     /**
+     * @param  array<string, mixed>  $data
      * @param  Collection<int, Entry>  $sourceEntries
      * @return Collection<int, string>
      */
-    protected function extractEntryReferencesFromEntry(Entry $entry, Collection $sourceEntries): Collection
+    protected function extractEntryReferencesFromDataArray(array $data, Collection $sourceEntries): Collection
     {
         /** @var Collection<int, string> $entryIds */
         $entryIds = collect();
-        /** @var array<string, mixed> $data */
-        $data = $entry->data()->all();
 
         $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
