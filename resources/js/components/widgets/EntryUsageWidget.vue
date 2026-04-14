@@ -41,16 +41,13 @@ const props = defineProps({
     },
 });
 
-const selectedCollection = ref('');
+const selectedCollection = ref(null);
 const exportType = ref('used');
 
-const collectionOptions = computed(() => [
-    { value: '', label: props.selectCollectionLabel },
-    ...props.collections.map((collection) => ({
-        value: collection.handle,
-        label: collection.title,
-    })),
-]);
+const collectionOptions = computed(() => props.collections.map((collection) => ({
+    value: collection.handle,
+    label: collection.title,
+})));
 
 const exportTypeOptions = computed(() => [
     { value: 'used', label: props.exportUsedLabel },
@@ -83,6 +80,7 @@ const exportEntries = () => {
                 <Select
                     v-model="selectedCollection"
                     :options="collectionOptions"
+                    :placeholder="props.selectCollectionLabel"
                 />
             </div>
 
