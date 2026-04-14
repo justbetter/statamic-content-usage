@@ -1,0 +1,12 @@
+{
+  "resources/css/statamic-content-usage.css": {
+    "file": "assets/statamic-content-usage-c42ce534.js",
+    "isEntry": true,
+    "src": "resources/css/statamic-content-usage.css"
+  },
+  "resources/js/statamic-content-usage.js": {
+    "file": "assets/statamic-content-usage-4ed993c7.js",
+    "isEntry": true,
+    "src": "resources/js/statamic-content-usage.js"
+  }
+}
