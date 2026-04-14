@@ -4,8 +4,8 @@
 
 ## Features
 
-- **Asset Usage Tracking**: Discover which assets are used on which pages
-- **Entry Usage Tracking**: Track which entries from a specific collection are referenced in other entries
+- **Asset Usage Tracking**: Discover which assets are used across content sources
+- **Entry Usage Tracking**: Track which entries from a specific collection are referenced across content sources
 - **Unused Content Detection**: Identify assets and entries that aren't being used anywhere
 - **CSV Exports**: Export usage reports and unused content lists to CSV files
 - **Dashboard Widgets**: Quick access to exports directly from the Statamic control panel
@@ -44,7 +44,7 @@ The Entry Usage widget allows you to:
 
 #### Export Asset Usage
 
-Export a CSV report showing which assets are used on which pages:
+Export a CSV report showing which assets are used across content sources:
 
 ```bash
 php artisan content-usage:export-assets
@@ -84,7 +84,7 @@ php artisan content-usage:export-unused-assets --output=/tmp/unused.csv
 
 #### Export Entry Usage
 
-Export a CSV report showing which entries from a collection are referenced in other entries:
+Export a CSV report showing which entries from a collection are referenced across content sources:
 
 ```bash
 php artisan content-usage:export-entries --collection=blog
@@ -125,9 +125,9 @@ php artisan content-usage:export-unused-entries global --output=/tmp/unused-glob
 | Asset Path | The path to the asset file |
 | Asset URL | The public URL of the asset |
 | Asset Basename | The filename of the asset |
-| Page Title | The title of the entry/page using the asset |
-| Page URL | The URL of the entry/page |
-| Collection | The collection handle of the entry/page |
+| Source Title | The title of the content source using the asset |
+| Source URL | The URL of the content source (when available) |
+| Source Type | The source type/handle (e.g. collection, globals, navigation, taxonomy) |
 
 ### Entry Usage Export
 
@@ -136,9 +136,9 @@ php artisan content-usage:export-unused-entries global --output=/tmp/unused-glob
 | Entry Title | The title of the referenced entry |
 | Entry URL | The URL of the referenced entry |
 | Entry Collection | The collection handle of the referenced entry |
-| Page Title | The title of the entry/page referencing it |
-| Page URL | The URL of the entry/page |
-| Page Collection | The collection handle of the referencing entry/page |
+| Source Title | The title of the content source referencing it |
+| Source URL | The URL of the content source (when available) |
+| Source Type | The source type/handle (e.g. collection, globals, navigation, taxonomy) |
 
 ### Unused Assets Export
 
@@ -168,13 +168,19 @@ php artisan content-usage:export-unused-entries global --output=/tmp/unused-glob
 
 ## How It Works
 
-The addon scans all entries in your Statamic site and:
+The addon scans content sources in your Statamic site and:
 
-1. **For Assets**: Extracts asset references from entry data, including:
+1. **Sources scanned**:
+   - Entries
+   - Globals (all localizations)
+   - Navigation trees
+   - Terms (all localizations)
+
+2. **For Assets**: Extracts asset references from source data, including:
    - `assets::` prefixed IDs (e.g., `assets::main::image.jpg`)
    - Plain file paths that can be resolved to assets
 
-2. **For Entries**: Extracts entry references from entry data, including:
+3. **For Entries**: Extracts entry references from source data, including:
    - `entry::collection::id` format references
    - Plain UUID references that match entries in the tracked collection
 

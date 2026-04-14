@@ -37,6 +37,9 @@ class AssetUsageExporterTest extends TestCase
         $this->assertStringContainsString('Test Page', $result);
         $this->assertStringContainsString('/test-page', $result);
         $this->assertStringContainsString('pages', $result);
+        $this->assertStringContainsString('Source Title', $result);
+        $this->assertStringContainsString('Source URL', $result);
+        $this->assertStringContainsString('Source Type', $result);
     }
 
     #[Test]
@@ -47,6 +50,6 @@ class AssetUsageExporterTest extends TestCase
 
         $this->assertStringContainsString('Asset Path', $result);
         $this->assertStringContainsString('Asset URL', $result);
-        $this->assertStringContainsString('Collection', $result);
+        $this->assertStringContainsString('Source Type', $result);
     }
 }

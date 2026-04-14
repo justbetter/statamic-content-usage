@@ -21,9 +21,9 @@ class EntryUsageExporter
             'Entry Title',
             'Entry URL',
             'Entry Collection',
-            'Page Title',
-            'Page URL',
-            'Page Collection',
+            'Source Title',
+            'Source URL',
+            'Source Type',
         ];
 
         $writer->insertOne($headers);
