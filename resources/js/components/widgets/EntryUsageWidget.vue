@@ -11,6 +11,7 @@
                 <Select
                     v-model="selectedCollection"
                     :options="collectionOptions"
+                    :placeholder="selectCollectionLabel"
                 />
             </div>
 
@@ -86,13 +87,10 @@ const {
 const selectedCollection = ref(null);
 const exportType = ref('used');
 
-const collectionOptions = computed(() => [
-    { value: '', label: selectCollectionLabel },
-    ...collections.map((collection) => ({
-        value: collection.handle,
-        label: collection.title,
-    })),
-]);
+const collectionOptions = computed(() => collections.map((collection) => ({
+    value: collection.handle,
+    label: collection.title,
+})));
 
 const exportTypeOptions = computed(() => [
     { value: 'used', label: exportUsedLabel },
