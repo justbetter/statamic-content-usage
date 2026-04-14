@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import vue from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
+import statamic from '@statamic/cms/vite-plugin';
 
 export default defineConfig({
     plugins: [
@@ -11,16 +12,6 @@ export default defineConfig({
             ],
             publicDirectory: 'resources/dist',
         }),
-        vue(),
+        statamic(),
     ],
-    server: {
-        cors: true,
-        host: 'localhost',
-        port: 5175,
-        strictPort: true,
-        https: false,
-        hmr: {
-            host: 'localhost',
-        },
-    },
 });
