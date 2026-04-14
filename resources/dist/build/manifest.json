@@ -1,12 +1,15 @@
 {
   "resources/css/statamic-content-usage.css": {
-    "file": "assets/statamic-content-usage-l0sNRNKZ.js",
+    "file": "assets/statamic-content-usage-x1XGuNl0.css",
     "name": "statamic-content-usage",
+    "names": [
+      "statamic-content-usage.css"
+    ],
     "src": "resources/css/statamic-content-usage.css",
     "isEntry": true
   },
   "resources/js/statamic-content-usage.js": {
-    "file": "assets/statamic-content-usage-CW6dhlfY.js",
+    "file": "assets/statamic-content-usage-SMn7H5cg.js",
     "name": "statamic-content-usage",
     "src": "resources/js/statamic-content-usage.js",
     "isEntry": true

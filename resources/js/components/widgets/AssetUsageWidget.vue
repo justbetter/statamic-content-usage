@@ -1,86 +1,3 @@
-<script setup>
-import { computed, ref } from 'vue';
-import { Button, Select, Text, Widget } from '@statamic/cms/ui';
-
-const props = defineProps({
-    title: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    containersLabel: {
-        type: String,
-        required: true,
-    },
-    containersInstructions: {
-        type: String,
-        required: true,
-    },
-    noContainersMessage: {
-        type: String,
-        required: true,
-    },
-    exportButtonLabel: {
-        type: String,
-        required: true,
-    },
-    exportUnusedButtonLabel: {
-        type: String,
-        required: true,
-    },
-    exportUrl: {
-        type: String,
-        required: true,
-    },
-    exportUnusedUrl: {
-        type: String,
-        required: true,
-    },
-    containers: {
-        type: Array,
-        required: true,
-    },
-});
-
-const selectedContainers = ref(props.containers.map((container) => container.handle));
-
-const hasContainers = props.containers.length > 0;
-
-const containerOptions = computed(() => props.containers.map((container) => ({
-    value: container.handle,
-    label: container.title,
-})));
-
-const exportSelected = () => {
-    if (!hasContainers) {
-        return;
-    }
-
-    const query = new URLSearchParams();
-    selectedContainers.value.forEach((handle) => {
-        query.append('containers[]', handle);
-    });
-
-    window.location.assign(`${props.exportUrl}?${query.toString()}`);
-};
-
-const exportUnused = () => {
-    if (!hasContainers) {
-        return;
-    }
-
-    const query = new URLSearchParams();
-    selectedContainers.value.forEach((handle) => {
-        query.append('containers[]', handle);
-    });
-
-    window.location.assign(`${props.exportUnusedUrl}?${query.toString()}`);
-};
-</script>
-
 <template>
     <Widget :title="title">
         <div class="p-4 flex flex-col gap-4">
@@ -128,3 +45,97 @@ const exportUnused = () => {
         </div>
     </Widget>
 </template>
+
+<script setup>
+import { computed, ref } from 'vue';
+import { Button, Select, Text, Widget } from '@statamic/cms/ui';
+
+const {
+    title,
+    description,
+    containersLabel,
+    containersInstructions,
+    noContainersMessage,
+    exportButtonLabel,
+    exportUnusedButtonLabel,
+    exportUrl,
+    exportUnusedUrl,
+    containers,
+} = defineProps({
+    title: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    containersLabel: {
+        type: String,
+        required: true,
+    },
+    containersInstructions: {
+        type: String,
+        required: true,
+    },
+    noContainersMessage: {
+        type: String,
+        required: true,
+    },
+    exportButtonLabel: {
+        type: String,
+        required: true,
+    },
+    exportUnusedButtonLabel: {
+        type: String,
+        required: true,
+    },
+    exportUrl: {
+        type: String,
+        required: true,
+    },
+    exportUnusedUrl: {
+        type: String,
+        required: true,
+    },
+    containers: {
+        type: Array,
+        required: true,
+    },
+});
+
+const selectedContainers = ref(containers.map((container) => container.handle));
+
+const hasContainers = containers.length > 0;
+
+const containerOptions = computed(() => containers.map((container) => ({
+    value: container.handle,
+    label: container.title,
+})));
+
+const exportSelected = () => {
+    if (!hasContainers) {
+        return;
+    }
+
+    const query = new URLSearchParams();
+    selectedContainers.value.forEach((handle) => {
+        query.append('containers[]', handle);
+    });
+
+    window.location.assign(`${exportUrl}?${query.toString()}`);
+};
+
+const exportUnused = () => {
+    if (!hasContainers) {
+        return;
+    }
+
+    const query = new URLSearchParams();
+    selectedContainers.value.forEach((handle) => {
+        query.append('containers[]', handle);
+    });
+
+    window.location.assign(`${exportUnusedUrl}?${query.toString()}`);
+};
+</script>
