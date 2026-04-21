@@ -1,12 +1,17 @@
 {
   "resources/css/statamic-content-usage.css": {
-    "file": "assets/statamic-content-usage-c42ce534.js",
-    "isEntry": true,
-    "src": "resources/css/statamic-content-usage.css"
+    "file": "assets/statamic-content-usage-x1XGuNl0.css",
+    "name": "statamic-content-usage",
+    "names": [
+      "statamic-content-usage.css"
+    ],
+    "src": "resources/css/statamic-content-usage.css",
+    "isEntry": true
   },
   "resources/js/statamic-content-usage.js": {
-    "file": "assets/statamic-content-usage-4ed993c7.js",
-    "isEntry": true,
-    "src": "resources/js/statamic-content-usage.js"
+    "file": "assets/statamic-content-usage-CpmTIWDB.js",
+    "name": "statamic-content-usage",
+    "src": "resources/js/statamic-content-usage.js",
+    "isEntry": true
   }
 }

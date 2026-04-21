@@ -34,9 +34,9 @@ class EntryUsageExporterTest extends TestCase
         $this->assertStringContainsString('Entry Title', $result);
         $this->assertStringContainsString('Entry URL', $result);
         $this->assertStringContainsString('Entry Collection', $result);
-        $this->assertStringContainsString('Page Title', $result);
-        $this->assertStringContainsString('Page URL', $result);
-        $this->assertStringContainsString('Page Collection', $result);
+        $this->assertStringContainsString('Source Title', $result);
+        $this->assertStringContainsString('Source URL', $result);
+        $this->assertStringContainsString('Source Type', $result);
         $this->assertStringContainsString('Test Entry', $result);
         $this->assertStringContainsString('/test-entry', $result);
         $this->assertStringContainsString('blog', $result);
@@ -54,8 +54,8 @@ class EntryUsageExporterTest extends TestCase
         $this->assertStringContainsString('Entry Title', $result);
         $this->assertStringContainsString('Entry URL', $result);
         $this->assertStringContainsString('Entry Collection', $result);
-        $this->assertStringContainsString('Page Title', $result);
-        $this->assertStringContainsString('Page URL', $result);
-        $this->assertStringContainsString('Page Collection', $result);
+        $this->assertStringContainsString('Source Title', $result);
+        $this->assertStringContainsString('Source URL', $result);
+        $this->assertStringContainsString('Source Type', $result);
     }
 }

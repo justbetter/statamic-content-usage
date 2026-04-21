@@ -21,9 +21,9 @@ class AssetUsageExporter
             'Asset Path',
             'Asset URL',
             'Asset Basename',
-            'Page Title',
-            'Page URL',
-            'Collection',
+            'Source Title',
+            'Source URL',
+            'Source Type',
         ];
 
         $writer->insertOne($headers);

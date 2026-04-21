@@ -10,13 +10,14 @@ use JustBetter\StatamicContentUsage\Tests\TestCase;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
 
 class ExportUnusedAssetsCommandTest extends TestCase
 {
     #[Test]
     public function it_can_export_unused_assets_to_csv_file(): void
     {
-        $container = $this->mock(\Statamic\Assets\AssetContainer::class, function (MockInterface $mock): void {
+        $container = $this->mock(AssetContainer::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('main');
         });
 
@@ -70,7 +71,7 @@ class ExportUnusedAssetsCommandTest extends TestCase
     #[Test]
     public function it_uses_default_output_path_when_no_output_option_is_provided(): void
     {
-        $container = $this->mock(\Statamic\Assets\AssetContainer::class, function (MockInterface $mock): void {
+        $container = $this->mock(AssetContainer::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('main');
         });
 
@@ -106,7 +107,7 @@ class ExportUnusedAssetsCommandTest extends TestCase
     #[Test]
     public function it_filters_by_container_handles_when_provided(): void
     {
-        $container = $this->mock(\Statamic\Assets\AssetContainer::class, function (MockInterface $mock): void {
+        $container = $this->mock(AssetContainer::class, function (MockInterface $mock): void {
             $mock->shouldReceive('handle')->andReturn('main');
         });
 
