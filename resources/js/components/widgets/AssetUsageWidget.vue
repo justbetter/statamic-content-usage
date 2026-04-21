@@ -1,20 +1,20 @@
 <template>
-    <Widget :title="title">
+    <Widget :title="t('statamic-content-usage::widgets.asset-usage.heading')">
         <div class="p-4 flex flex-col gap-4">
             <Text>
-                {{ description }}
+                {{ t('statamic-content-usage::widgets.asset-usage.description') }}
             </Text>
 
             <div class="space-y-2">
-                <Text class="font-medium">{{ containersLabel }}</Text>
+                <Text class="font-medium">{{ t('statamic-content-usage::widgets.asset-usage.containers_label') }}</Text>
 
                 <Text v-if="!hasContainers">
-                    {{ noContainersMessage }}
+                    {{ t('statamic-content-usage::widgets.asset-usage.no_containers') }}
                 </Text>
 
                 <template v-else>
                     <Text>
-                        {{ containersInstructions }}
+                        {{ t('statamic-content-usage::widgets.asset-usage.containers_instructions') }}
                     </Text>
 
                     <Select
@@ -31,7 +31,7 @@
                     :disabled="!hasContainers"
                     @click="exportSelected"
                 >
-                    {{ exportButtonLabel }}
+                    {{ t('statamic-content-usage::widgets.asset-usage.export_button') }}
                 </Button>
 
                 <Button
@@ -39,7 +39,7 @@
                     :disabled="!hasContainers"
                     @click="exportUnused"
                 >
-                    {{ exportUnusedButtonLabel }}
+                    {{ t('statamic-content-usage::widgets.asset-usage.export_unused_button') }}
                 </Button>
             </div>
         </div>
@@ -51,45 +51,10 @@ import { computed, ref } from 'vue';
 import { Button, Select, Text, Widget } from '@statamic/cms/ui';
 
 const {
-    title,
-    description,
-    containersLabel,
-    containersInstructions,
-    noContainersMessage,
-    exportButtonLabel,
-    exportUnusedButtonLabel,
     exportUrl,
     exportUnusedUrl,
     containers,
 } = defineProps({
-    title: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    containersLabel: {
-        type: String,
-        required: true,
-    },
-    containersInstructions: {
-        type: String,
-        required: true,
-    },
-    noContainersMessage: {
-        type: String,
-        required: true,
-    },
-    exportButtonLabel: {
-        type: String,
-        required: true,
-    },
-    exportUnusedButtonLabel: {
-        type: String,
-        required: true,
-    },
     exportUrl: {
         type: String,
         required: true,
@@ -107,6 +72,7 @@ const {
 const selectedContainers = ref(containers.map((container) => container.handle));
 
 const hasContainers = containers.length > 0;
+const t = (key) => typeof window.__ === 'function' ? window.__(key) : key;
 
 const containerOptions = computed(() => containers.map((container) => ({
     value: container.handle,

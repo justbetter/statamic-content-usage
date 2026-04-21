@@ -4,13 +4,12 @@ namespace JustBetter\StatamicContentUsage\Services;
 
 use Illuminate\Support\Collection;
 use JustBetter\StatamicContentUsage\Data\AssetUsageData;
+use JustBetter\StatamicContentUsage\Data\ContentSourceData;
 use JustBetter\StatamicContentUsage\Data\PageUsageData;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
-use Statamic\Entries\Entry;
 use Statamic\Facades\Asset as AssetFacade;
 use Statamic\Facades\AssetContainer as AssetContainerFacade;
-use Statamic\Facades\Entry as EntryFacade;
 
 class AssetUsageService
 {
@@ -23,11 +22,10 @@ class AssetUsageService
         /** @var Collection<string, AssetUsageData> $usage */
         $usage = collect();
 
-        /** @var Collection<int, Entry> $entries */
-        $entries = EntryFacade::all();
+        $sources = (new ContentSourceScanner)->scan();
 
-        foreach ($entries as $entry) {
-            $this->processEntry($entry, $usage);
+        foreach ($sources as $source) {
+            $this->processSource($source, $usage);
         }
 
         $result = $usage->map(function (AssetUsageData $item) {
@@ -54,17 +52,12 @@ class AssetUsageService
     /**
      * @param  Collection<string, AssetUsageData>  $usage
      */
-    protected function processEntry(Entry $entry, Collection $usage): void
+    protected function processSource(ContentSourceData $source, Collection $usage): void
     {
-        $entryId = $entry->id();
-        $entryTitle = $entry->get('title', '');
-        $entryUrl = $entry->url() ?? '';
-        $entryCollection = $entry->collection()->handle();
-
-        $assets = $this->extractAssetsFromEntry($entry);
+        $assets = $this->extractAssetsFromDataArray($source->data);
 
         foreach ($assets as $assetId) {
-            $this->processAsset($assetId, $entryId, $entryTitle, $entryUrl, $entryCollection, $usage);
+            $this->processAsset($assetId, $source->id, $source->title, $source->url, $source->collection, $usage);
         }
     }
 
@@ -138,14 +131,13 @@ class AssetUsageService
     }
 
     /**
+     * @param  array<string, mixed>  $data
      * @return Collection<int, string>
      */
-    protected function extractAssetsFromEntry(Entry $entry): Collection
+    protected function extractAssetsFromDataArray(array $data): Collection
     {
         /** @var Collection<int, string> $assets */
         $assets = collect();
-        /** @var array<string, mixed> $data */
-        $data = $entry->data()->all();
 
         $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 

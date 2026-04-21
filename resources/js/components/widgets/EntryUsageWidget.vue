@@ -1,16 +1,17 @@
 <template>
-    <Widget :title="title">
+    <Widget :title="t('statamic-content-usage::widgets.entry-usage.heading')">
         <div class="p-4 flex flex-col gap-4">
             <Text>
-                {{ description }}
+                {{ t('statamic-content-usage::widgets.entry-usage.description') }}
             </Text>
 
             <div class="space-y-2">
-                <Text class="font-medium">{{ collectionLabel }}</Text>
+                <Text class="font-medium">{{ t('statamic-content-usage::widgets.entry-usage.collection_label') }}</Text>
 
                 <Select
                     v-model="selectedCollection"
                     :options="collectionOptions"
+                    :placeholder="t('statamic-content-usage::widgets.entry-usage.select_collection')"
                 />
             </div>
 
@@ -24,7 +25,7 @@
                 :disabled="!selectedCollection"
                 @click="exportEntries"
             >
-                {{ exportButtonLabel }}
+                {{ t('statamic-content-usage::widgets.entry-usage.export_button') }}
             </Button>
         </div>
     </Widget>
@@ -35,44 +36,9 @@ import { computed, ref } from 'vue';
 import { Button, Select, Text, Widget } from '@statamic/cms/ui';
 
 const {
-    title,
-    description,
-    collectionLabel,
-    selectCollectionLabel,
-    exportButtonLabel,
-    exportUsedLabel,
-    exportUnusedLabel,
     exportUrl,
     collections,
 } = defineProps({
-    title: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    collectionLabel: {
-        type: String,
-        required: true,
-    },
-    selectCollectionLabel: {
-        type: String,
-        required: true,
-    },
-    exportButtonLabel: {
-        type: String,
-        required: true,
-    },
-    exportUsedLabel: {
-        type: String,
-        required: true,
-    },
-    exportUnusedLabel: {
-        type: String,
-        required: true,
-    },
     exportUrl: {
         type: String,
         required: true,
@@ -83,20 +49,19 @@ const {
     },
 });
 
-const selectedCollection = ref('');
+const selectedCollection = ref(null);
 const exportType = ref('used');
 
-const collectionOptions = computed(() => [
-    { value: '', label: selectCollectionLabel },
-    ...collections.map((collection) => ({
-        value: collection.handle,
-        label: collection.title,
-    })),
-]);
+const t = (key) => typeof window.__ === 'function' ? window.__(key) : key;
+
+const collectionOptions = computed(() => collections.map((collection) => ({
+    value: collection.handle,
+    label: collection.title,
+})));
 
 const exportTypeOptions = computed(() => [
-    { value: 'used', label: exportUsedLabel },
-    { value: 'unused', label: exportUnusedLabel },
+    { value: 'used', label: t('statamic-content-usage::widgets.entry-usage.export_used_button') },
+    { value: 'unused', label: t('statamic-content-usage::widgets.entry-usage.export_unused_button') },
 ]);
 
 const exportEntries = () => {
