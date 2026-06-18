@@ -125,6 +125,25 @@ class AssetUsageServiceTest extends TestCase
     }
 
     #[Test]
+    public function it_skips_assets_that_cannot_be_found_during_processing(): void
+    {
+        $entryData = $this->createEntryData(['image' => 'assets::test_container::test-image.jpg']);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $asset = $this->createAsset('assets::test_container::test-image.jpg', 'test-image.jpg', 'https://example.com/test-image.jpg', 'test-image.jpg');
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetFacade::shouldReceive('find')
+            ->with('assets::test_container::test-image.jpg')
+            ->andReturn($asset, null);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertEmpty($result);
+    }
+
+    #[Test]
     public function it_deduplicates_pages_for_the_same_asset(): void
     {
         $entryData = $this->createEntryData(['image' => 'assets::test_container::test-image.jpg']);
@@ -452,8 +471,8 @@ class AssetUsageServiceTest extends TestCase
         });
 
         EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
-        AssetFacade::shouldReceive('find')->with('assets::main::test-image.jpg')->andReturn($assetMain, $assetMain);
-        AssetFacade::shouldReceive('find')->with('assets::images::logo.jpg')->andReturn($assetImages, null);
+        AssetFacade::shouldReceive('find')->with('assets::main::test-image.jpg')->andReturn($assetMain, $assetMain, $assetMain);
+        AssetFacade::shouldReceive('find')->with('assets::images::logo.jpg')->andReturn($assetImages, $assetImages, null);
 
         $service = new AssetUsageService;
         $result = $service->findAssetUsage(['main']);
