@@ -161,6 +161,187 @@ class AssetUsageServiceTest extends TestCase
     }
 
     #[Test]
+    public function it_can_resolve_plain_asset_filenames_without_slashes(): void
+    {
+        $entryData = $this->createEntryData(['background_image' => 'test-not-to-be-deleted.jpg']);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $container = $this->createAssetContainer('assets');
+        $asset = $this->createAsset('assets::assets::test-not-to-be-deleted.jpg', 'test-not-to-be-deleted.jpg', 'https://example.com/test-not-to-be-deleted.jpg', 'test-not-to-be-deleted.jpg');
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetContainerFacade::shouldReceive('all')->andReturn(collect([$container]));
+        AssetFacade::shouldReceive('find')
+            ->with('assets::test-not-to-be-deleted.jpg')
+            ->andReturn($asset);
+        AssetFacade::shouldReceive('find')
+            ->with('assets::assets::test-not-to-be-deleted.jpg')
+            ->andReturn($asset);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertCount(1, $result);
+        $first = $result->first();
+        $this->assertNotNull($first);
+        $this->assertEquals('assets::assets::test-not-to-be-deleted.jpg', $first->assetId);
+    }
+
+    #[Test]
+    public function it_can_resolve_asset_paths_in_arrays(): void
+    {
+        $entryData = $this->createEntryData(['icon' => ['logo/hart-voor-gastouderopvang.svg']]);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $container = $this->createAssetContainer('assets');
+        $asset = $this->createAsset('assets::assets::logo/hart-voor-gastouderopvang.svg', 'logo/hart-voor-gastouderopvang.svg', 'https://example.com/logo/hart-voor-gastouderopvang.svg', 'hart-voor-gastouderopvang.svg');
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetContainerFacade::shouldReceive('all')->andReturn(collect([$container]));
+        AssetFacade::shouldReceive('find')
+            ->with('assets::logo/hart-voor-gastouderopvang.svg')
+            ->andReturn($asset);
+        AssetFacade::shouldReceive('find')
+            ->with('assets::assets::logo/hart-voor-gastouderopvang.svg')
+            ->andReturn($asset);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertCount(1, $result);
+        $first = $result->first();
+        $this->assertNotNull($first);
+        $this->assertEquals('assets::assets::logo/hart-voor-gastouderopvang.svg', $first->assetId);
+    }
+
+    #[Test]
+    public function it_can_resolve_asset_references_with_asset_prefix(): void
+    {
+        $entryData = $this->createEntryData(['button_link' => 'asset::test_container::downloads/test-document.pdf']);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $asset = $this->createAsset(
+            'assets::test_container::downloads/test-document.pdf',
+            'downloads/test-document.pdf',
+            'https://example.com/assets/downloads/test-document.pdf',
+            'test-document.pdf'
+        );
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetFacade::shouldReceive('find')
+            ->with('test_container::downloads/test-document.pdf')
+            ->andReturn($asset);
+        AssetFacade::shouldReceive('find')
+            ->with('assets::test_container::downloads/test-document.pdf')
+            ->andReturn($asset);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertCount(1, $result);
+        $first = $result->first();
+        $this->assertNotNull($first);
+        $this->assertEquals('assets::test_container::downloads/test-document.pdf', $first->assetId);
+    }
+
+    #[Test]
+    public function it_can_resolve_statamic_asset_urls(): void
+    {
+        $entryData = $this->createEntryData([
+            'content' => [
+                [
+                    'type' => 'text',
+                    'text' => 'Download',
+                    'marks' => [
+                        [
+                            'type' => 'link',
+                            'attrs' => [
+                                'href' => 'statamic://asset::test_container::downloads/test-document.pdf',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $asset = $this->createAsset(
+            'assets::test_container::downloads/test-document.pdf',
+            'downloads/test-document.pdf',
+            'https://example.com/assets/downloads/test-document.pdf',
+            'test-document.pdf'
+        );
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetFacade::shouldReceive('find')
+            ->with('test_container::downloads/test-document.pdf')
+            ->andReturn($asset);
+        AssetFacade::shouldReceive('find')
+            ->with('assets::test_container::downloads/test-document.pdf')
+            ->andReturn($asset);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertCount(1, $result);
+        $first = $result->first();
+        $this->assertNotNull($first);
+        $this->assertEquals('assets::test_container::downloads/test-document.pdf', $first->assetId);
+    }
+
+    #[Test]
+    public function it_can_resolve_asset_paths_in_bard_link_urls(): void
+    {
+        $entryData = $this->createEntryData([
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'marks' => [
+                                [
+                                    'type' => 'link',
+                                    'attrs' => [
+                                        'href' => 'https://example.com/assets/downloads/test-document.pdf',
+                                    ],
+                                ],
+                            ],
+                            'text' => 'Download',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $collection = $this->createPageCollection();
+        $entry = $this->createEntry($entryData, $collection);
+        $container = $this->createAssetContainer('assets');
+        $asset = $this->createAsset(
+            'assets::assets::downloads/test-document.pdf',
+            'downloads/test-document.pdf',
+            'https://example.com/assets/downloads/test-document.pdf',
+            'test-document.pdf'
+        );
+
+        EntryFacade::shouldReceive('all')->andReturn(new EntryCollection([$entry]));
+        AssetContainerFacade::shouldReceive('all')->andReturn(collect([$container]));
+        AssetFacade::shouldReceive('find')
+            ->with('assets::downloads/test-document.pdf')
+            ->andReturn($asset);
+        AssetFacade::shouldReceive('find')
+            ->with('assets::assets::downloads/test-document.pdf')
+            ->andReturn($asset);
+
+        $service = new AssetUsageService;
+        $result = $service->findAssetUsage();
+
+        $this->assertCount(1, $result);
+        $first = $result->first();
+        $this->assertNotNull($first);
+        $this->assertEquals('assets::assets::downloads/test-document.pdf', $first->assetId);
+    }
+
+    #[Test]
     public function it_can_resolve_plain_asset_paths_to_asset_ids(): void
     {
         $entryData = $this->createEntryData(['image' => 'test-folder/test-image.jpg']);

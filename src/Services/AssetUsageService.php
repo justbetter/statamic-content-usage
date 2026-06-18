@@ -145,29 +145,115 @@ class AssetUsageService
             return $assets;
         }
 
-        // Find assets:: prefixed references
-        preg_match_all('/assets::[^"\'\\s}]+/', $json, $assetMatches);
+        $normalizedJson = str_replace('\\/', '/', $json);
+
+        // Find assets:: prefixed references (e.g. assets::container::path)
+        preg_match_all('/assets::[^"\'\\s}]+/', $normalizedJson, $assetMatches);
 
         if (! empty($assetMatches[0])) {
             foreach ($assetMatches[0] as $match) {
-                $assets->push($match);
+                $this->addAssetReference($assets, $match);
             }
         }
 
-        // Find plain asset paths (format: "fieldname":"path/to/file.ext")
-        preg_match_all('/"([^"]+)"\s*:\s*"([^"]*\/[^"]*\.[a-zA-Z0-9]{2,5})"/', $json, $pathMatches);
+        // Find asset:: prefixed references (Link field, Bard images: asset::container::path)
+        preg_match_all('/(?<!s)asset::[^"\'\\s}]+/', $normalizedJson, $assetRefMatches);
 
-        if (! empty($pathMatches[2])) {
-            foreach ($pathMatches[2] as $path) {
-                // Try to resolve the path to an asset ID
-                $assetId = $this->resolvePathToAssetId($path);
-                if ($assetId !== null) {
-                    $assets->push($assetId);
-                }
+        if (! empty($assetRefMatches[0])) {
+            foreach ($assetRefMatches[0] as $match) {
+                $this->addAssetReference($assets, $match);
+            }
+        }
+
+        // Find statamic://asset:: references (Bard asset links)
+        preg_match_all('~statamic://asset::([^"\'?]+)~', $normalizedJson, $statamicMatches);
+
+        if (! empty($statamicMatches[1])) {
+            foreach ($statamicMatches[1] as $id) {
+                $this->addAssetReference($assets, $id);
+            }
+        }
+
+        // Find plain asset paths in field values and arrays (e.g. "image.jpg" or "folder/image.jpg")
+        preg_match_all('/"([^"]+\.[a-zA-Z0-9]{2,5})"/', $normalizedJson, $pathMatches);
+
+        if (! empty($pathMatches[1])) {
+            foreach ($pathMatches[1] as $path) {
+                $this->addResolvedAssetPath($assets, $path);
+            }
+        }
+
+        // Find asset paths in URLs (e.g. https://example.com/assets/folder/file.pdf in Bard links)
+        preg_match_all('~/assets/([^"\'?]+)~', $normalizedJson, $urlMatches);
+
+        if (! empty($urlMatches[1])) {
+            foreach ($urlMatches[1] as $path) {
+                $this->addResolvedAssetPath($assets, $path);
             }
         }
 
         return $assets->unique()->values();
+    }
+
+    /**
+     * @param  Collection<int, string>  $assets
+     */
+    protected function addAssetReference(Collection $assets, string $reference): void
+    {
+        if (str_starts_with($reference, 'assets::')) {
+            /** @var ?Asset $asset */
+            $asset = AssetFacade::find($reference);
+
+            if ($asset) {
+                $assets->push($asset->id());
+            }
+
+            return;
+        }
+
+        if (str_starts_with($reference, 'asset::')) {
+            /** @var ?Asset $asset */
+            $asset = AssetFacade::find(substr($reference, strlen('asset::')));
+
+            if ($asset) {
+                $assets->push($asset->id());
+            }
+
+            return;
+        }
+
+        /** @var ?Asset $asset */
+        $asset = AssetFacade::find($reference);
+
+        if ($asset) {
+            $assets->push($asset->id());
+        }
+    }
+
+    /**
+     * @param  Collection<int, string>  $assets
+     */
+    protected function addResolvedAssetPath(Collection $assets, string $path): void
+    {
+        if (
+            str_starts_with($path, 'assets::')
+            || str_starts_with($path, 'asset::')
+            || str_starts_with($path, 'entry::')
+            || str_starts_with($path, 'http://')
+            || str_starts_with($path, 'https://')
+        ) {
+            if (str_starts_with($path, 'asset::')) {
+                $this->addAssetReference($assets, $path);
+            }
+
+            return;
+        }
+
+        $assetId = $this->resolvePathToAssetId($path);
+
+        if ($assetId !== null) {
+            $assets->push($assetId);
+        }
     }
 
     protected function resolvePathToAssetId(string $path): ?string
